@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ilitha Fintech - Interview Coach SA</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#0f172a;color:white;text-align:center;padding:20px}
+.card{background:white;color:#0f172a;border-radius:16px;padding:20px;max-width:500px;margin:20px auto}
+button{background:#16a34a;color:white;border:0;padding:14px 20px;border-radius:10px;font-size:16px;width:100%;margin-top:10px}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #ddd;margin-top:10px;font-size:16px}
+#q{font-size:19px;font-weight:bold;min-height:70px}
+</style>
+</head>
+<body>
+<h1>🎤 Interview Coach SA</h1>
+<p>By Ilitha Fintech • Practice. Prepare. Get Hired.</p>
+<div class="card">
+<label>Choose Job Type</label>
+<select id="job">
+<option>Retail Assistant</option>
+<option>Call Centre Agent</option>
+<option>Admin Clerk</option>
+<option>Bank Teller</option>
+<option>Security Guard</option>
+</select>
+<p id="q">Tap Start Practice to get your first question.</p>
+<input id="ans" placeholder="Type your answer here...">
+<button onclick="nextQ()">Start Practice / Next Question ➜</button>
+<button onclick="tip()" style="background:#0f172a">Get a Tip 💡</button>
+<p id="tip"></p>
+</div>
+<p>© 2026 ilithafintech.co.za</p>
+<script>
+const qs=[
+"Tell me about yourself.",
+"Why do you want this job?",
+"What are your strengths?",
+"Where do you see yourself in 5 years?",
+"Tell me about a time you handled a difficult customer.",
+"Why should we hire you?",
+"What is your biggest weakness?",
+"How do you handle pressure?"
+];
+let i=0;
+function nextQ(){document.getElementById('q').innerText=qs[i%qs.length];i++;document.getElementById('ans').value='';document.getElementById('tip').innerText='';}
+function tip(){document.getElementById('tip').innerText='Tip: Answer in 3 parts - Situation, What you did, Result. Keep it under 1 minute.';}
+</script>
+</body>
+  </html>
