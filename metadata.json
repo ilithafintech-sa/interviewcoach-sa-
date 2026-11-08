@@ -1,0 +1,6 @@
+{
+  "name": "InterviewCoach SA",
+  "description": "An offline-ready smart interview preparation platform for South African job seekers (DPSA, SAPS, Nursing, Education, Retail, and Call Centres) featuring AI-powered CV builders, oral practice simulators, and real-time gap analysis.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

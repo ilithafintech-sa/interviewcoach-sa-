@@ -1,0 +1,163 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Helper Primitives
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == "cengcanis@gmail.com" && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    // Validation Blueprint: UserProfile
+    function isValidUserProfile(data, userId) {
+      return data.keys().hasAll(['userId', 'name', 'selectedPostLevel']) &&
+        data.keys().hasOnly(['userId', 'name', 'email', 'area', 'selectedPostLevel', 'targetSector', 'createdAt', 'updatedAt']) &&
+        data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+        data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+        data.selectedPostLevel in ['junior', 'management', 'senior'] &&
+        (!('email' in data) || (data.email is string && data.email.size() <= 150)) &&
+        (!('area' in data) || (data.area is string && data.area.size() <= 100)) &&
+        (!('targetSector' in data) || (data.targetSector is string && data.targetSector.size() <= 100)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 100)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 100));
+    }
+
+    // Validation Blueprint: UserPrivateInfo
+    function isValidUserPrivateInfo(data, userId) {
+      return data.keys().hasAll(['userId']) &&
+        data.keys().hasOnly(['userId', 'phone', 'email', 'updatedAt']) &&
+        data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+        (!('phone' in data) || (data.phone is string && data.phone.size() <= 30)) &&
+        (!('email' in data) || (data.email is string && data.email.size() <= 150)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 100));
+    }
+
+    // Validation Blueprint: PracticeAnswer
+    function isValidPracticeAnswer(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'questionText', 'transcription', 'score']) &&
+        data.keys().hasOnly(['id', 'userId', 'jobId', 'questionIndex', 'questionText', 'transcription', 'score', 'starTips', 'createdAt', 'updatedAt']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+        data.questionText is string && data.questionText.size() <= 1000 &&
+        data.transcription is string && data.transcription.size() <= 10000 &&
+        data.score is int && data.score >= 0 && data.score <= 100 &&
+        (!('jobId' in data) || (data.jobId is string && data.jobId.size() <= 128)) &&
+        (!('questionIndex' in data) || (data.questionIndex is int && data.questionIndex >= 0)) &&
+        (!('starTips' in data) || (data.starTips is string && data.starTips.size() <= 2000)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 100)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 100));
+    }
+
+    // Validation Blueprint: MockInterviewSession
+    function isValidMockSession(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'jobTitle', 'overallScore', 'turnsCount']) &&
+        data.keys().hasOnly(['id', 'userId', 'jobTitle', 'sector', 'panelChairName', 'overallScore', 'contentScore', 'styleScore', 'confidenceScore', 'clarityScore', 'turnsCount', 'feedbackSummary', 'createdAt']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+        data.jobTitle is string && data.jobTitle.size() <= 200 &&
+        data.overallScore is int && data.overallScore >= 0 && data.overallScore <= 100 &&
+        data.turnsCount is int && data.turnsCount >= 0 &&
+        (!('sector' in data) || (data.sector is string && data.sector.size() <= 100)) &&
+        (!('panelChairName' in data) || (data.panelChairName is string && data.panelChairName.size() <= 100)) &&
+        (!('contentScore' in data) || (data.contentScore is int && data.contentScore >= 0 && data.contentScore <= 100)) &&
+        (!('styleScore' in data) || (data.styleScore is int && data.styleScore >= 0 && data.styleScore <= 100)) &&
+        (!('confidenceScore' in data) || (data.confidenceScore is int && data.confidenceScore >= 0 && data.confidenceScore <= 100)) &&
+        (!('clarityScore' in data) || (data.clarityScore is int && data.clarityScore >= 0 && data.clarityScore <= 100)) &&
+        (!('feedbackSummary' in data) || (data.feedbackSummary is string && data.feedbackSummary.size() <= 5000)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 100));
+    }
+
+    // Validation Blueprint: QuestionBankItem
+    function isValidQuestionBankItem(data) {
+      return data.keys().hasAll(['id', 'sector', 'questionText', 'difficulty']) &&
+        data.keys().hasOnly(['id', 'sector', 'jobTitle', 'questionText', 'category', 'difficulty', 'createdAt', 'createdBy']) &&
+        data.id is string && data.id.size() <= 128 &&
+        data.sector is string && data.sector.size() <= 100 &&
+        data.questionText is string && data.questionText.size() <= 1000 &&
+        data.difficulty in ['Junior', 'Medium', 'Senior', 'Executive'] &&
+        (!('jobTitle' in data) || (data.jobTitle is string && data.jobTitle.size() <= 200)) &&
+        (!('category' in data) || (data.category is string && data.category.size() <= 100)) &&
+        (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 100)) &&
+        (!('createdBy' in data) || (data.createdBy is string && data.createdBy.size() <= 128));
+    }
+
+    // Users Collection & Subcollections
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming(), userId);
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming(), userId) &&
+                    incoming().userId == existing().userId;
+      allow delete: if isOwner(userId) || isAdmin();
+
+      // PII Split Subcollection
+      match /private/{docId} {
+        allow get: if isOwner(userId) || isAdmin();
+        allow list: if isOwner(userId) || isAdmin();
+        allow create, update: if isOwner(userId) && isValidId(docId) && isValidUserPrivateInfo(incoming(), userId);
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+
+      // Practice Answers Subcollection
+      match /practice_answers/{answerId} {
+        allow get: if isOwner(userId) || isAdmin();
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isValidId(answerId) && isValidPracticeAnswer(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(answerId) && isValidPracticeAnswer(incoming(), userId) &&
+                      incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+
+      // Mock Interview Sessions Subcollection
+      match /mock_sessions/{sessionId} {
+        allow get: if isOwner(userId) || isAdmin();
+        allow list: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) && isValidId(sessionId) && isValidMockSession(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(sessionId) && isValidMockSession(incoming(), userId) &&
+                      incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Curated Public Sector Question Bank
+    match /question_bank/{questionId} {
+      allow get, list: if isSignedIn();
+      allow create, update: if isAdmin() && isValidId(questionId) && isValidQuestionBankItem(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // Admins Collection
+    match /admins/{adminId} {
+      allow get: if isSignedIn();
+      allow list, create, update, delete: if isAdmin();
+    }
+  }
+}

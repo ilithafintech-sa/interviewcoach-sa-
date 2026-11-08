@@ -1,0 +1,266 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Public profile information for an InterviewCoach SA job seeker.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The unique Firebase Auth UID of the user.",
+          "maxLength": 128
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name or candidate full name.",
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "description": "Candidate email address.",
+          "maxLength": 150
+        },
+        "area": {
+          "type": "string",
+          "description": "Geographical province or municipality in South Africa.",
+          "maxLength": 100
+        },
+        "selectedPostLevel": {
+          "type": "string",
+          "description": "DPSA / post tier level.",
+          "enum": ["junior", "management", "senior"]
+        },
+        "targetSector": {
+          "type": "string",
+          "description": "Primary targeted sector (e.g., DPSA, Health, SAPS, Education).",
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the profile was initialized."
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the profile was last modified."
+        }
+      },
+      "required": ["userId", "name", "selectedPostLevel"]
+    },
+    "UserPrivateInfo": {
+      "title": "UserPrivateInfo",
+      "description": "Sensitive contact info and PII separated under subcollection.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The unique Firebase Auth UID of the user.",
+          "maxLength": 128
+        },
+        "phone": {
+          "type": "string",
+          "description": "Candidate phone number.",
+          "maxLength": 30
+        },
+        "email": {
+          "type": "string",
+          "description": "Candidate private email address.",
+          "maxLength": 150
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp."
+        }
+      },
+      "required": ["userId"]
+    },
+    "PracticeAnswer": {
+      "title": "PracticeAnswer",
+      "description": "Candidate response and evaluation record for an individual interview question.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the answer record.",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner UID.",
+          "maxLength": 128
+        },
+        "jobId": {
+          "type": "string",
+          "description": "Job identifier or role slug.",
+          "maxLength": 128
+        },
+        "questionIndex": {
+          "type": "integer",
+          "description": "Index of question within practice set."
+        },
+        "questionText": {
+          "type": "string",
+          "description": "The interview prompt asked.",
+          "maxLength": 1000
+        },
+        "transcription": {
+          "type": "string",
+          "description": "Speech-to-text transcript or written answer.",
+          "maxLength": 10000
+        },
+        "score": {
+          "type": "integer",
+          "description": "Overall score between 0 and 100."
+        },
+        "starTips": {
+          "type": "string",
+          "description": "Actionable STAR coaching feedback.",
+          "maxLength": 2000
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last modified timestamp."
+        }
+      },
+      "required": ["id", "userId", "questionText", "transcription", "score"]
+    },
+    "MockInterviewSession": {
+      "title": "MockInterviewSession",
+      "description": "Full mock interview session transcript, metadata, and multi-dimensional scoring.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique session identifier.",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner UID.",
+          "maxLength": 128
+        },
+        "jobTitle": {
+          "type": "string",
+          "description": "Role being simulated.",
+          "maxLength": 200
+        },
+        "sector": {
+          "type": "string",
+          "description": "Sector category (e.g., DPSA, SAPS, Nursing).",
+          "maxLength": 100
+        },
+        "panelChairName": {
+          "type": "string",
+          "description": "Interviewer persona name.",
+          "maxLength": 100
+        },
+        "overallScore": {
+          "type": "integer",
+          "description": "Average overall score 0-100."
+        },
+        "contentScore": {
+          "type": "integer",
+          "description": "Content dimension score 0-100."
+        },
+        "styleScore": {
+          "type": "integer",
+          "description": "Communication style score 0-100."
+        },
+        "confidenceScore": {
+          "type": "integer",
+          "description": "Confidence dimension score 0-100."
+        },
+        "clarityScore": {
+          "type": "integer",
+          "description": "Clarity dimension score 0-100."
+        },
+        "turnsCount": {
+          "type": "integer",
+          "description": "Number of question-response turns completed."
+        },
+        "feedbackSummary": {
+          "type": "string",
+          "description": "Holistic coaching summary.",
+          "maxLength": 5000
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp session completed."
+        }
+      },
+      "required": ["id", "userId", "jobTitle", "overallScore", "turnsCount"]
+    },
+    "QuestionBankItem": {
+      "title": "QuestionBankItem",
+      "description": "Curated public sector question bank items.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Question ID.",
+          "maxLength": 128
+        },
+        "sector": {
+          "type": "string",
+          "description": "Sector category.",
+          "maxLength": 100
+        },
+        "jobTitle": {
+          "type": "string",
+          "description": "Target job title.",
+          "maxLength": 200
+        },
+        "questionText": {
+          "type": "string",
+          "description": "Full interview question prompt.",
+          "maxLength": 1000
+        },
+        "category": {
+          "type": "string",
+          "description": "Competency or question category (Batho Pele, Conflict, Technical, etc.).",
+          "maxLength": 100
+        },
+        "difficulty": {
+          "type": "string",
+          "description": "Target competency level.",
+          "enum": ["Junior", "Medium", "Senior", "Executive"]
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Creator user UID or system tag.",
+          "maxLength": 128
+        }
+      },
+      "required": ["id", "sector", "questionText", "difficulty"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Top-level candidate public profile collection keyed by user auth UID."
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": "UserPrivateInfo",
+      "description": "Subcollection isolating personal contact information."
+    },
+    "/users/{userId}/practice_answers/{answerId}": {
+      "schema": "PracticeAnswer",
+      "description": "Individual interview practice answers scored for the user."
+    },
+    "/users/{userId}/mock_sessions/{sessionId}": {
+      "schema": "MockInterviewSession",
+      "description": "Full AI mock interview sessions with multi-dimensional breakdowns."
+    },
+    "/question_bank/{questionId}": {
+      "schema": "QuestionBankItem",
+      "description": "Read-only curated question bank available to candidates."
+    }
+  }
+}
